@@ -1,21 +1,36 @@
 const fs = require('fs');
 const path = require('path');
 
-async function bebra() {
+const getInfo = async ()  => {
   try {
+    let fileNames = [];
+    let fileSizes = [];
     const files = await fs.promises.readdir(path.resolve(__dirname, 'secret-folder'), {withFileTypes: true});
     for (const file of files) {
       if (!file.isDirectory()) {
-        console.log(file.name);
+        fileNames.push(file.name);
         fs.stat(path.resolve(__dirname, 'secret-folder', file.name), (error, stats) => {
-          console.log(stats.size);
+          console.log(`${file.name} ${stats.size}`);
+          fileSizes.push(stats.size);
         });
       }
     }
+    console.log(fileNames);
+    console.log(fileSizes);
+    return (fileNames, fileSizes);
      
   } catch (err) {
     console.error(err);
   }
-}
+};
 
-bebra();
+// const show = (tuple) => {
+//   for (let i = 0; i < tuple[0].length; i += 1) {
+//     console.log(`${tuple[0][i]}`);
+//   }
+// };
+
+getInfo();
+
+
+// show(getInfo());
