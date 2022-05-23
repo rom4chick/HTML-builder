@@ -35,6 +35,11 @@ rl.on('line', (input) => {
   } else {
     data += `\n${input}`;
   }
+  fs.writeFile(path.resolve(__dirname, 'text.txt'), data, (err) => {
+    if (err) {
+      console.log(err);
+    }
+  });
 });
 
 
