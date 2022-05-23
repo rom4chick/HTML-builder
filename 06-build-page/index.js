@@ -20,47 +20,81 @@ const copyFolder = async (folderName) => {
   });
 };
 
-const insertTemplate = async () => {
-  let data = '';
-  let readStream = fs.createReadStream(path.resolve(__dirname, 'template.html'), 'utf-8');
+// const insertTemplate = async () => {
+//   let data = '';
+//   let readStream = fs.createReadStream(path.resolve(__dirname, 'template.html'), 'utf-8');
 
-  readStream.on('data', (chunk) => {
-    data += chunk;
-  }).on('end', () => {
-    let result = data;
-    let headerData = '';
-    let footerData = '';
-    let articlesData = '';
+//   readStream.on('data', (chunk) => {
+//     data += chunk;
+//   }).on('end', () => {
+//     let result = data;
+//     let headerData = '';
+//     let footerData = '';
+//     let articlesData = '';
 
-    let headerReadStream = fs.createReadStream(path.resolve(__dirname, 'components', 'header.html'), 'utf-8');
-    let footerReadStream = fs.createReadStream(path.resolve(__dirname, 'components', 'footer.html'), 'utf-8');
-    let articlesReadStream = fs.createReadStream(path.resolve(__dirname, 'components', 'articles.html'), 'utf-8');
+//     let headerReadStream = fs.createReadStream(path.resolve(__dirname, 'components', 'header.html'), 'utf-8');
+//     let footerReadStream = fs.createReadStream(path.resolve(__dirname, 'components', 'footer.html'), 'utf-8');
+//     let articlesReadStream = fs.createReadStream(path.resolve(__dirname, 'components', 'articles.html'), 'utf-8');
     
-    headerReadStream.on('data', (headerChunk) => {
-      headerData += headerChunk;
-    }).on('end', () => {
-      result = result.replace('{{header}}', headerData);
-    });
+//     headerReadStream.on('data', (headerChunk) => {
+//       headerData += headerChunk;
+//     }).on('end', () => {
+//       result = result.replace('{{header}}', headerData);
+//     });
 
-    footerReadStream.on('data', (footerChunk) => {
-      footerData += footerChunk;
-    }).on('end', () => {
-      result = result.replace('{{footer}}', footerData);
-    });
+//     footerReadStream.on('data', (footerChunk) => {
+//       footerData += footerChunk;
+//     }).on('end', () => {
+//       result = result.replace('{{footer}}', footerData);
+//     });
 
-    articlesReadStream.on('data', (articlesChunk) => {
-      articlesData += articlesChunk;
-    }).on('end', () => {
-      result = result.replace('{{articles}}', articlesData);
-      fs.writeFile(path.resolve(__dirname, 'project-dist', 'index.html'), result, (err) => {
-        if (err) {
-          console.log(err);
+//     articlesReadStream.on('data', (articlesChunk) => {
+//       articlesData += articlesChunk;
+//     }).on('end', () => {
+//       result = result.replace('{{articles}}', articlesData);
+      // fs.writeFile(path.resolve(__dirname, 'project-dist', 'index.html'), result, (err) => {
+      //   if (err) {
+      //     console.log(err);
+      //   }
+      // });
+//     });
+//   });
+// };
+
+const insertTemplate = async () => {
+  let readData = '';
+  let data = '';
+
+  let readStream = fs.createReadStream(path.resolve(__dirname, 'template.html'), 'utf-8');
+  readStream.on('data', (readChunk) => {
+    readData += readChunk;
+  }).on('end', () => {
+    let result = readData;
+    fs.readdir(path.resolve(__dirname, 'components'), (err, files) => {
+      files.forEach(async (file) => {
+        if (file.slice(-5) === '.html') {
+          let readStream = fs.createReadStream(path.resolve(__dirname, 'components', file), 'utf-8');
+          readStream.on('data', (chunk) => {
+            data += chunk;
+          }).on('end', () => {
+            // fs.writeFile(path.resolve(__dirname, 'project-dist', 'index.html'), data, (err) => {
+            //   if (err) {
+            //     console.log(err);
+            //   }
+            // });
+            result = result.replace(file.slice(0, -5), data);
+            fs.writeFile(path.resolve(__dirname, 'project-dist', 'index.html'), result, (err) => {
+              if (err) {
+                console.log(err);
+              }
+            });
+          });
         }
       });
     });
-
-   
   });
+
+  
 };
 
 const bundleCss = () => {
