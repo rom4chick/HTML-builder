@@ -17,8 +17,6 @@ fs.readdir(path.resolve(__dirname, 'styles'), (err, files) => {
         });
       });
     }
-   
-    
   });
 });
 
