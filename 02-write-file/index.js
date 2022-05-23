@@ -1,10 +1,4 @@
-const process = require('node:process');
-
 const readline = require('readline');
-
-
-
-// process.stdin.resume();
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -23,6 +17,5 @@ rl.on('line', (input) => {
     console.log('You\'ve ended input');
     rl.close();
   }
-  
 });
 
