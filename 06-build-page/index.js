@@ -1,12 +1,12 @@
 const fs = require('fs');
 const path = require('path');
 
-const makeFolder = async () => {
+const createFolder = async () => {
   await fs.promises.mkdir(path.resolve(__dirname, 'project-dist'), { recursive: true });
   await fs.promises.mkdir(path.resolve(__dirname, 'project-dist', 'assets'), { recursive: true });
 };
 
-const copyFolder = async (folderName) => {
+const analogFolder = async (folderName) => {
   await fs.promises.mkdir(path.resolve(__dirname, 'project-dist', 'assets', folderName), {recursive: true});
   fs.readdir(path.resolve(__dirname, 'assets', folderName), (err, files) => {
     files.forEach(async (file) => {
@@ -20,9 +20,12 @@ const copyFolder = async (folderName) => {
   });
 };
 
-const insertTemplate = async () => {
+
+
+const takeTemplate = async () => {
   let readData = '';
   let data = '';
+  // let resultBebra = '';
 
   let readStream = fs.createReadStream(path.resolve(__dirname, 'template.html'), 'utf-8');
   readStream.on('data', (readChunk) => {
@@ -32,23 +35,36 @@ const insertTemplate = async () => {
     fs.readdir(path.resolve(__dirname, 'components'), (err, files) => {
       files.forEach(async (file) => {
         if (file.slice(-5) === '.html') {
+          console.log('File: ' + file);
           let readStream = fs.createReadStream(path.resolve(__dirname, 'components', file), 'utf-8');
+          // data = '';
           readStream.on('data', (chunk) => {
-            data += chunk;
-          }).on('end', () => {
-            result = result.replace(file.slice(0, -5), data);
+            if (!data) {
+              data += chunk;
+            } else {
+              data = '';
+              data += chunk;
+            }
+            console.log(file);
+            console.log(`{{${file.slice(0, -5)}}}`);
+            result = result.replace(`{{${file.slice(0, -5)}}}`, data);
             fs.writeFile(path.resolve(__dirname, 'project-dist', 'index.html'), result, (err) => {
               if (err) {
                 console.log(err);
               }
             });
+            console.log('data: ' + data);
+          }).on('end', () => {
+
+            // resultBebra = result;
           });
         }
+
       });
     });
   });
 
-  
+
 };
 
 const bundleCss = () => {
@@ -72,14 +88,15 @@ const bundleCss = () => {
   });
 };
 
-makeFolder();
+createFolder();
 
-copyFolder('img');
+analogFolder('img');
 
-copyFolder('fonts');
+analogFolder('fonts');
 
-copyFolder('svg');
+analogFolder('svg');
 
-insertTemplate();
+takeTemplate();
 
 bundleCss();
+
